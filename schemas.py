@@ -8,13 +8,12 @@ Each Pydantic model represents a collection in your database.
 Model name is converted to lowercase for the collection name:
 - User -> "user" collection
 - Product -> "product" collection
-- BlogPost -> "blogs" collection
+- BlogPost -> "blogpost" collection
+- Project -> "project" collection
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
-
-# Example schemas (replace with your own):
+from pydantic import BaseModel, Field, HttpUrl
+from typing import Optional, List
 
 class User(BaseModel):
     """
@@ -38,11 +37,27 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+class Project(BaseModel):
+    """Portfolio projects
+    Collection: "project"
+    """
+    title: str = Field(..., description="Project title")
+    summary: str = Field(..., description="Short description")
+    tags: List[str] = Field(default_factory=list, description="Tech stack / tags")
+    repo_url: Optional[HttpUrl] = Field(None, description="Git repository URL")
+    demo_url: Optional[HttpUrl] = Field(None, description="Live demo URL")
+    featured: bool = Field(False, description="Mark as featured")
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class BlogPost(BaseModel):
+    """Blog posts
+    Collection: "blogpost"
+    """
+    title: str = Field(..., description="Post title")
+    slug: str = Field(..., description="URL slug")
+    excerpt: str = Field(..., description="Short summary")
+    content: Optional[str] = Field(None, description="Markdown content")
+    tags: List[str] = Field(default_factory=list, description="Tags")
+    cover_image: Optional[HttpUrl] = Field(None, description="Cover image URL")
+    published: bool = Field(True, description="Is published")
+
+# Note: The Flames database viewer may read these via /schema endpoint
